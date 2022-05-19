@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-      runs-on: macos-12
+      runs-on: macos-latest
 
       steps:
         - name: Checkout Repository
@@ -18,7 +18,7 @@ jobs:
 
         - name: Install tart 
           run: | 
-            brew install cirruslabs/cli/tart
+            curl -L -o tart https://github.com/cirruslabs/tart/releases/latest/download/tart && sudo mv tart /usr/local/bin/tart && sudo chmod +x /usr/local/bin/tart
         
         - name: Packer init
           uses: hashicorp/packer-github-actions@master

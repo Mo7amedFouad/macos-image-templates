@@ -16,25 +16,19 @@ jobs:
         - name: Checkout Repository
           uses: actions/checkout@v2
 
-        - name: Install tart 
+        - name: Install dependencies 
           run: | 
             curl -L -o tart https://github.com/cirruslabs/tart/releases/latest/download/tart && sudo mv tart /usr/local/bin/tart && sudo chmod +x /usr/local/bin/tart
+            brew tap hashicorp/tap
+            brew install hashicorp/tap/packer
         
         - name: Packer init
-          uses: hashicorp/packer-github-actions@master
-          with:
-            command: init
-            target: templates/xcode.pkr.hcl
+          run: |
+             packer init templates/xcode.pkr.hcl
 
         - name: Packer build
-          uses: hashicorp/packer-github-actions@master
-          with:
-            command: build
-            arguments: -var xcode_version="${{ github.event.inputs.xcode_version }}"
-            target: templates/xcode.pkr.hcl
-            working_directory: buid
-          env:
-            PACKER_LOG: 1
+          run: |
+            packer build -var xcode_version="${{ github.event.inputs.xcode_version }}" templates/xcode.pkr.hcl
 
         - name: Push to ghcr
           env:

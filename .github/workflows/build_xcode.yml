@@ -1,0 +1,49 @@
+name: Build Xcode Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      xcode_version: 
+        description: "Xcode Version:"
+        required: true
+        default: "13.4"
+
+jobs:
+  build:
+      runs-on: macos-12
+
+      steps:
+        - name: Checkout Repository
+          uses: actions/checkout@v2
+
+        - name: Install tart 
+          run: | 
+            brew install cirruslabs/cli/tart
+        
+        - name: Packer init
+          uses: hashicorp/packer-github-actions@master
+          with:
+            command: init
+            target: templates/xcode.pkr.hcl
+
+        - name: Packer build
+          uses: hashicorp/packer-github-actions@master
+          with:
+            command: build
+            arguments: -var xcode_version="${{ github.event.inputs.xcode_version }}"
+            target: templates/xcode.pkr.hcl
+            working_directory: buid
+          env:
+            PACKER_LOG: 1
+
+        - name: Push to ghcr
+          env:
+            GH_TOKEN: ${{ secrets.GH_TOKEN }}
+            GH_USERNAME: ${{ secrets.GH_USERNAME }}
+            MATCH_KEYCHAIN_PASSWORD: ${{ secrets.MATCH_KEYCHAIN_PASSWORD }}
+          run: |
+            echo "::add-mask::$GH_USERNAME"
+            echo "::add-mask::$GH_TOKEN"
+            chmod +x tart.exp
+            ./tart.exp 
+            tart push monterey-xcode ghcr.io/Mo7amedFouad/monterey-xcode:${{ github.event.inputs.xcode_version }}

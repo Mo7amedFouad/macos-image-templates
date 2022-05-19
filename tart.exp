@@ -1,0 +1,12 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn tart login ghcr.io
+
+expect "User: "
+send -- "$env(GH_USERNAME)\n"
+
+expect "Password: "
+send -- "$env(GH_TOKEN)\r"
+
+expect eof

@@ -15,8 +15,8 @@ variable "xcode_version" {
 source "tart-cli" "tart" {
   vm_base_name = "monterey-base"
   vm_name      = "monterey-xcode:${var.xcode_version}"
-  cpu_count    = 4
-  memory_gb    = 8
+  cpu_count    = 8
+  memory_gb    = 16
   disk_size_gb = 70
   ssh_password = "admin"
   ssh_username = "admin"
@@ -70,10 +70,12 @@ build {
   provisioner "shell" {
     inline = [
       "source ~/.zprofile",
-      "brew install libimobiledevice ideviceinstaller ios-deploy fastlane",
+      "brew install libimobiledevice ideviceinstaller ios-deploy fastlane imagemagick node swiftlint",
       "sudo gem update",
-      "sudo gem install cocoapods",
-      "sudo gem uninstall --ignore-dependencies ffi && sudo gem install ffi -- --enable-libffi-alloc"
+      "sudo gem install cocoapods -v 1.11.3",
+      "sudo gem install fastlane -v 2.205.2",
+      "sudo gem install ffi -v 1.15.5",
+      "sudo gem install xcode-install -v 2.8.0"
     ]
   }
 }
